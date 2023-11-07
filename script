@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# Replace with the actual serial number you are looking for.
-SERIALNUMBER="your_serial_number_here"
+# Check if a serial number was provided as an argument.
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 SERIALNUMBER"
+  exit 1
+fi
+
+# Take the first argument as the serial number.
+SERIALNUMBER="$1"
 
 # Function to check the serial number of a certificate file.
 check_serial() {
@@ -28,5 +34,5 @@ find / -type f \( -name "*.crt" -o -name "*.pem" \) -print0 2>/dev/null | xargs 
 
 # Check if the "match_found" variable is still "false".
 if [ "$match_found" = "false" ]; then
-  echo "No certificates with serial number $SERIALNUMBER were found."
+  echo "No additional certificates with serial number $SERIALNUMBER were found."
 fi
