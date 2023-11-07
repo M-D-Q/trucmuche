@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Replace with the actual serial number you are looking for.
+SERIALNUMBER="your_serial_number_here"
+
+# Function to check the serial number of a certificate file.
+check_serial() {
+  local file="$1"
+  local serial="$2"
+  local cert_serial
+
+  cert_serial=$(openssl x509 -noout -serial -in "$file" 2>/dev/null)
+  if [[ "$cert_serial" == "serial=$serial" ]]; then
+    echo "Match found in file: $file"
+    return 0
+  fi
+  return 1
+}
+
+export -f check_serial
+
+# Initial message assuming no match is found.
+match_found="false"
+
+# Search for .crt and .pem files and check their serial number.
+# Find will print errors if there are directories it cannot access.
+find / -type f \( -name "*.crt" -o -name "*.pem" \) -print0 2>/dev/null | xargs -0 -I {} bash -c 'check_serial "$@"' _ {} "$SERIALNUMBER" && match_found="true"
+
+# Check if the "match_found" variable is still "false".
+if [ "$match_found" = "false" ]; then
+  echo "No certificates with serial number $SERIALNUMBER were found."
+fi
